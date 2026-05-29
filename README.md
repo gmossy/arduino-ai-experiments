@@ -47,17 +47,80 @@ This project was built and programmed using:
 
 ---
 
-## How to Build and Upload
+## Step-by-Step Setup and Installation
 
-To run this project locally, ensure you have PlatformIO installed, then execute:
+### 1. Prerequisites and Installation
 
+To set up and compile this project, you need the **PlatformIO CLI** or **VS Code with the PlatformIO IDE extension**.
+
+*   **PlatformIO CLI (Core):**
+    Install via Homebrew (macOS) or Python pip:
+    ```bash
+    # Via Homebrew (macOS)
+    brew install platformio
+
+    # Via Python pip
+    pip install -U platformio
+    ```
+*   **USB Drivers:**
+    Depending on your specific NodeMCU board, you may need to install the USB-to-UART bridge drivers for your OS:
+    *   [CP210x USB to UART Bridge Drivers](https://www.silabs.com/developers/usb-to-uart-bridge-vcp-drivers)
+    *   [CH340/CH341 USB to Serial Drivers](http://www.wch-ic.com/downloads/CH341SER_ZIP.html) (common on budget ESP8266 boards)
+
+### 2. Getting the Code
+
+Clone the repository to your local machine:
 ```bash
-# Build the project and download all libraries
+git clone https://github.com/gmossy/arduino-ai-experiments.git
+cd arduino-ai-experiments
+```
+
+### 3. Configuring Wi-Fi Credentials
+
+Open `src/blink.ino` in your editor and locate the Wi-Fi credentials section (around lines 14-15):
+```cpp
+const char* ssid = "YOUR_2.4GHZ_SSID";
+const char* password = "YOUR_WIFI_PASSWORD";
+```
+> [!WARNING]
+> Ensure you connect to a **2.4 GHz Wi-Fi network**. The ESP8266 does not support 5 GHz networks.
+
+### 4. Detecting the USB Port
+
+Connect your ESP8266 to your computer using a micro-USB cable that supports data transfer.
+*   **On macOS/Linux:** Find the device path by listing active serial devices:
+    ```bash
+    ls /dev/cu.usbserial-*
+    # Example: /dev/cu.usbserial-0001
+    ```
+*   **On Windows:** Check Device Manager under "Ports (COM & LPT)" to identify the COM port (e.g., `COM3`).
+
+If your port path differs from `/dev/cu.usbserial-0001`, open `platformio.ini` and update the `upload_port` and `monitor_port` values:
+```ini
+upload_port = YOUR_DETECTED_PORT
+monitor_port = YOUR_DETECTED_PORT
+```
+
+---
+
+## Building and Uploading
+
+Once configured, run the following PlatformIO commands in your terminal inside the project directory:
+
+### 1. Compile the Project
+Builds the binaries and automatically downloads all external library dependencies (`Adafruit GFX`, `Adafruit SSD1306`, and `BusIO`):
+```bash
 pio run
+```
 
-# Upload the firmware to the ESP8266 via USB
+### 2. Upload the Firmware
+Flashes the compiled program to the ESP8266 flash memory via the configured USB port:
+```bash
 pio run --target upload
+```
 
-# View logs via Serial Monitor
-pio device monitor --baud 115200
+### 3. Monitor Serial Output
+Launch the serial console monitor to read diagnostic messages (such as Wi-Fi connection steps and the Google ping check status) at `115200` baud:
+```bash
+pio device monitor
 ```
